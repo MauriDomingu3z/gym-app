@@ -1,0 +1,204 @@
+<ion-header class="detail-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/exercises" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ exercise()?.nameEs ?? 'Ejercicio' }}</ion-title>
+    <ion-buttons slot="end">
+      @if (!loading() && !notFound()) {
+        <ion-button
+          fill="clear"
+          class="favorite-button"
+          [class.is-active]="isFavorite()"
+          [disabled]="togglingFavorite()"
+          (click)="toggleFavorite()"
+        >
+          <ion-icon slot="icon-only" [name]="isFavorite() ? 'heart' : 'heart-outline'"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="detail-content">
+  @if (loading()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else if (notFound()) {
+    <p class="ion-padding">No se encontró el ejercicio.</p>
+  } @else if (exercise(); as ex) {
+    <div class="detail-body">
+      <section class="frame-gallery no-scrollbar">
+        @for (frame of ex.frames; track frame; let i = $index) {
+          <div class="frame-slide">
+            <ion-img [src]="frameUrl(frame)" [alt]="ex.nameEs"></ion-img>
+            <span class="frame-slide__label">Paso {{ i + 1 }}</span>
+          </div>
+        }
+      </section>
+
+      <section class="info-grid">
+        <div class="info-tile">
+          <div class="info-tile__icon"><ion-icon name="body-outline"></ion-icon></div>
+          <div class="info-tile__label">Músculo principal</div>
+          <div class="info-tile__value">{{ muscleLabel(ex.primaryMuscle) }}</div>
+        </div>
+        @if (ex.secondaryMuscles.length) {
+          <div class="info-tile info-tile--alt">
+            <div class="info-tile__icon"><ion-icon name="accessibility-outline"></ion-icon></div>
+            <div class="info-tile__label">Músculos sec.</div>
+            <div class="info-tile__value">{{ secondaryMusclesLabel(ex.secondaryMuscles) }}</div>
+          </div>
+        }
+        <div class="info-tile">
+          <div class="info-tile__icon"><ion-icon name="barbell-outline"></ion-icon></div>
+          <div class="info-tile__label">Equipo</div>
+          <div class="info-tile__value">{{ equipmentLabel(ex.equipment) }}</div>
+        </div>
+        <div class="info-tile info-tile--alt">
+          <div class="info-tile__icon"><ion-icon name="repeat-outline"></ion-icon></div>
+          <div class="info-tile__label">Tipo</div>
+          <div class="info-tile__value">{{ typeLabel(ex.exerciseType) }}</div>
+        </div>
+      </section>
+
+      @if (ex.instructionsEs.length) {
+        <section class="instructions-card">
+          <h2>Cómo hacerlo</h2>
+          <ol class="instructions-list">
+            @for (step of ex.instructionsEs; track $index; let i = $index) {
+              <li>
+                <span class="instructions-list__index" [class.is-alt]="i % 2 === 1">{{ i + 1 }}</span>
+                <p>{{ step }}</p>
+              </li>
+            }
+          </ol>
+        </section>
+      }
+
+      <section class="tracker">
+        @if (lastSet(); as last) {
+          <p class="last-set">
+            <ion-icon name="time-outline"></ion-icon>
+            Última vez: {{ formatSetSummary(last) }}
+          </p>
+        }
+
+        @if (exerciseDone()) {
+          <div class="done-card">
+            <p class="done-card__title">¡Ejercicio completado!</p>
+            <p class="done-card__subtitle">{{ loggedSets().length }} serie(s) hoy.</p>
+            <ion-button expand="block" class="pill-btn pill-btn--outline" (click)="resumeExercise()">
+              Agregar otra serie
+            </ion-button>
+          </div>
+        } @else {
+          @switch (trackerPhase()) {
+            @case ('idle') {
+              <ion-button expand="block" class="pill-btn pill-btn--solid" (click)="startTracking()">
+                Iniciar serie
+              </ion-button>
+            }
+            @case ('active') {
+              <div class="active-card">
+                @if (isTimedExercise()) {
+                  <div class="stopwatch">{{ elapsedSeconds() }}s</div>
+                } @else {
+                  <div class="active-card__inputs">
+                    @if (showsWeightField()) {
+                      <div class="unit-toggle">
+                        <button
+                          type="button"
+                          class="unit-toggle__btn"
+                          [class.is-active]="preferredUnit() === 'kg'"
+                          (click)="setPreferredUnit('kg')"
+                        >
+                          KG
+                        </button>
+                        <button
+                          type="button"
+                          class="unit-toggle__btn"
+                          [class.is-active]="preferredUnit() === 'lb'"
+                          (click)="setPreferredUnit('lb')"
+                        >
+                          LB
+                        </button>
+                      </div>
+                      <ion-item lines="none" class="tracker-input">
+                        <ion-input
+                          type="number"
+                          [label]="weightFieldLabel() + ' (' + preferredUnit() + ')'"
+                          labelPlacement="floating"
+                          [value]="weightInput()"
+                          (ionInput)="onWeightInput($event.detail.value)"
+                        ></ion-input>
+                      </ion-item>
+                    }
+                    <ion-item lines="none" class="tracker-input">
+                      <ion-input
+                        type="number"
+                        label="Repeticiones"
+                        labelPlacement="floating"
+                        [value]="repsInput()"
+                        (ionInput)="onRepsInput($event.detail.value)"
+                      ></ion-input>
+                    </ion-item>
+                  </div>
+                }
+                <ion-button
+                  expand="block"
+                  class="pill-btn pill-btn--solid"
+                  [disabled]="saving()"
+                  (click)="finishSet()"
+                >
+                  {{ saving() ? 'Guardando…' : 'Terminar serie' }}
+                </ion-button>
+              </div>
+            }
+            @case ('resting') {
+              <div class="rest-card">
+                <h3>¡Tiempo de descanso!</h3>
+                @if (lastSet(); as last) {
+                  <span class="rest-card__chip">
+                    <ion-icon name="time-outline"></ion-icon>
+                    Última vez: {{ formatSetSummary(last) }}
+                  </span>
+                }
+                <div class="rest-card__timer">{{ restRemainingSeconds() }}s</div>
+                <ion-button expand="block" class="pill-btn pill-btn--inverse" (click)="skipRest()">
+                  Saltar descanso
+                  <ion-icon slot="end" name="play-skip-forward-outline"></ion-icon>
+                </ion-button>
+              </div>
+            }
+          }
+
+          @if (loggedSets().length > 0 && trackerPhase() === 'idle') {
+            <ion-button expand="block" fill="clear" class="pill-btn pill-btn--ghost" (click)="finishExercise()">
+              Finalizar ejercicio
+            </ion-button>
+          }
+        }
+
+        @if (loggedSets().length > 0) {
+          <h2 class="sets-heading">Series de hoy</h2>
+          <div class="sets-list">
+            @for (set of loggedSets(); track set.id) {
+              <div class="set-row">
+                <div class="set-row__label"><span class="set-row__dot"></span>Serie {{ set.setNumber }}</div>
+                <span class="set-row__value">{{ formatSetSummary(set) }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (sessionId()) {
+          <ion-button expand="block" color="danger" fill="outline" class="pill-btn" (click)="confirmFinishWorkout()">
+            Finalizar entrenamiento
+          </ion-button>
+        }
+      </section>
+    </div>
+  }
+</ion-content>

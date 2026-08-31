@@ -1,0 +1,47 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-form__item {
+  --background: #ffffff;
+  --color: var(--app-on-surface);
+  --placeholder-color: var(--app-on-surface-variant);
+  --border-radius: 12px;
+  --border-color: var(--app-outline-variant);
+  --border-width: 1px;
+  --border-style: solid;
+  --highlight-color-focused: var(--app-primary);
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  --min-height: 52px;
+
+  ion-icon {
+    color: var(--app-on-surface-variant);
+    font-size: 20px;
+    margin-inline-end: 12px;
+  }
+}
+
+.login-form__error {
+  font-size: 14px;
+  margin: 0;
+}
+
+.login-form__submit {
+  --background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-secondary) 100%);
+  --background-hover: linear-gradient(135deg, #c53889 0%, #7e1f8f 100%);
+  --background-activated: linear-gradient(135deg, #c53889 0%, #7e1f8f 100%);
+  --color: #ffffff;
+  --border-radius: 999px;
+  --box-shadow: 0 0 15px rgba(224, 64, 160, 0.35);
+  height: 52px;
+  font-weight: 700;
+  margin-top: 8px;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    --box-shadow: 0 0 25px rgba(224, 64, 160, 0.5);
+  }
+}

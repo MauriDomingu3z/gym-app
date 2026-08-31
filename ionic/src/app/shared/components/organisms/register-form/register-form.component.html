@@ -1,0 +1,47 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="register-form">
+  <ion-item lines="none" class="register-form__item">
+    <ion-icon slot="start" name="person-outline" aria-hidden="true"></ion-icon>
+    <ion-input
+      label="Nombre (opcional)"
+      labelPlacement="floating"
+      type="text"
+      formControlName="name"
+      autocomplete="name"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item lines="none" class="register-form__item">
+    <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+    <ion-input
+      label="Email"
+      labelPlacement="floating"
+      type="email"
+      formControlName="email"
+      autocomplete="email"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item lines="none" class="register-form__item">
+    <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+    <ion-input
+      label="Contraseña (mínimo 8 caracteres)"
+      labelPlacement="floating"
+      type="password"
+      formControlName="password"
+      autocomplete="new-password"
+    ></ion-input>
+  </ion-item>
+
+  @if (errorMessage()) {
+    <ion-text color="danger">
+      <p class="register-form__error">{{ errorMessage() }}</p>
+    </ion-text>
+  }
+
+  <ion-button expand="block" type="submit" [disabled]="loading()" class="register-form__submit">
+    {{ loading() ? 'Creando cuenta…' : 'Crear cuenta' }}
+    @if (!loading()) {
+      <ion-icon slot="end" name="arrow-forward" aria-hidden="true"></ion-icon>
+    }
+  </ion-button>
+</form>

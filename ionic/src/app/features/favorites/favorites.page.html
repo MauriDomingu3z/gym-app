@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Favoritos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="confirmLogout()" aria-label="Cerrar sesión">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="has-bottom-nav">
+  @if (loading()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else if (favorites().length === 0) {
+    <p class="ion-padding">Todavía no marcaste ningún ejercicio como favorito.</p>
+  } @else {
+    <app-exercise-list [exercises]="favorites()" (exerciseSelected)="onExerciseSelected($event)"></app-exercise-list>
+  }
+</ion-content>
+
+<app-bottom-nav></app-bottom-nav>

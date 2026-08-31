@@ -1,0 +1,6 @@
+/* You can add global styles to this file, and also import other style files */
+
+// Reserves space above the fixed app-bottom-nav so page content never sits under it.
+ion-content.has-bottom-nav {
+  --padding-bottom: 100px;
+}

@@ -1,0 +1,5 @@
+<div class="exercise-grid">
+  @for (exercise of exercises(); track exercise.id) {
+    <app-exercise-card [exercise]="exercise" (selected)="exerciseSelected.emit($event)"></app-exercise-card>
+  }
+</div>

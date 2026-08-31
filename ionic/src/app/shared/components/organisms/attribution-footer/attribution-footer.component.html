@@ -1,0 +1,8 @@
+@if (attribution(); as info) {
+  <ion-text color="medium" class="attribution-footer">
+    <p>
+      {{ info.notice }}
+      <a [href]="info.licenseUrl" target="_blank" rel="noopener">{{ info.license }}</a>
+    </p>
+  </ion-text>
+}

@@ -1,0 +1,7 @@
+<button type="button" class="exercise-card" (click)="onSelect()">
+  <div class="exercise-card__thumb">
+    <ion-img [src]="thumbnailUrl()" [alt]="exercise().nameEs"></ion-img>
+    <span class="exercise-card__badge" [class.is-secondary]="badgeTone() === 'secondary'">{{ muscleLabel() }}</span>
+  </div>
+  <h3 class="exercise-card__title">{{ exercise().nameEs }}</h3>
+</button>

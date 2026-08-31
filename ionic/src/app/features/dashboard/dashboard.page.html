@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <div class="app-header__row">
+      <div class="app-header__identity">
+        <div class="app-header__avatar">{{ initials() }}</div>
+        <div>
+          <p class="app-header__greeting">Hola, {{ greetingName() }}</p>
+          <h1 class="app-header__brand">GYM APP</h1>
+        </div>
+      </div>
+      <ion-button fill="clear" (click)="confirmLogout()" aria-label="Cerrar sesión">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding has-bottom-nav">
+  @if (loading()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else if (summary(); as s) {
+    <div class="streak-banner">
+      <div class="streak-value">{{ s.currentStreakDays }}</div>
+      <div class="streak-label">{{ s.currentStreakDays === 1 ? 'día seguido' : 'días seguidos' }}</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">{{ s.sessionsThisWeek }}</div>
+        <div class="stat-label">entrenamientos<br />esta semana</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ s.setsThisWeek }}</div>
+        <div class="stat-label">series<br />esta semana</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ s.minutesThisWeek }}</div>
+        <div class="stat-label">minutos<br />esta semana</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ s.totalSessions }}</div>
+        <div class="stat-label">entrenamientos<br />en total</div>
+      </div>
+    </div>
+
+    <h2>Últimos entrenamientos</h2>
+    @if (s.recentSessions.length === 0) {
+      <p class="empty-state">Todavía no registraste ningún entrenamiento completo.</p>
+    } @else {
+      <ion-list>
+        @for (session of s.recentSessions; track session.id) {
+          <ion-item lines="full">
+            <ion-label>
+              <h3>{{ formatSessionDate(session.startedAt) }}</h3>
+              <p>{{ session.exerciseCount }} ejercicio(s) · {{ session.setCount }} serie(s) · {{ session.durationMinutes }} min</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  }
+</ion-content>
+
+<app-bottom-nav></app-bottom-nav>

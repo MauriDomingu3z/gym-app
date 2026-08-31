@@ -1,0 +1,23 @@
+<ion-content class="auth-content" [fullscreen]="true">
+  <div class="auth-shell">
+    <div class="brand">
+      <ion-icon name="flash" aria-hidden="true"></ion-icon>
+      <span>GYM APP</span>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-card__header">
+        <h2>Creá tu cuenta</h2>
+        <p>Sumate para empezar a registrar tus entrenamientos.</p>
+      </div>
+
+      <app-register-form
+        [loading]="loading()"
+        [errorMessage]="errorMessage()"
+        (submitted)="onSubmit($event)"
+      ></app-register-form>
+
+      <p class="auth-footer">¿Ya tenés cuenta? <a routerLink="/auth/login">Ingresá</a></p>
+    </div>
+  </div>
+</ion-content>

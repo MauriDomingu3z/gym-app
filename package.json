@@ -1,0 +1,13 @@
+{
+  "name": "gym-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n API,IONIC -c blue,magenta \"npm run dev --prefix api\" \"npm start --prefix ionic\"",
+    "start": "npm run dev",
+    "install:all": "npm install --prefix api && npm install --prefix ionic"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

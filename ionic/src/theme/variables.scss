@@ -1,0 +1,43 @@
+:root {
+  // Design tokens — light surface system with a vibrant pink/violet accent,
+  // shared by every screen so the app reads as one consistent product.
+  --app-background: #fffbfe;
+  --app-surface: #fffbfe;
+  --app-surface-container-low: #fef5fa;
+  --app-surface-container: #ffffff;
+  --app-surface-container-high: #f4e0eb;
+  --app-surface-container-highest: #ffd8eb;
+  --app-outline: #81747a;
+  --app-outline-variant: #d3c2cb;
+  --app-on-surface: #1e1a1d;
+  --app-on-surface-variant: #4f444a;
+
+  --app-primary: #e040a0;
+  --app-primary-container: #ffd8eb;
+  --app-on-primary-container: #3b0028;
+  --app-secondary: #9c27b0;
+
+  // Ionic core color — mapped from the tokens above so every default
+  // component (buttons, badges, spinners, tabs) picks up the same accent.
+  --ion-color-primary: var(--app-primary);
+  --ion-color-primary-rgb: 224, 64, 160;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #c53889;
+  --ion-color-primary-tint: #e55cac;
+
+  --ion-color-medium: var(--app-on-surface-variant);
+  --ion-color-medium-rgb: 79, 68, 74;
+
+  // Ionic base — light background/text applied app-wide.
+  --ion-background-color: var(--app-background);
+  --ion-background-color-rgb: 255, 251, 254;
+  --ion-text-color: var(--app-on-surface);
+  --ion-text-color-rgb: 30, 26, 29;
+
+  --ion-toolbar-background: var(--app-background);
+  --ion-toolbar-color: var(--app-on-surface);
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+  --ion-border-color: var(--app-outline-variant);
+}

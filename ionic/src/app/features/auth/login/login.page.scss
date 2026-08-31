@@ -1,0 +1,76 @@
+.auth-content {
+  --background: var(--app-background);
+}
+
+.auth-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  color: var(--app-primary);
+
+  ion-icon {
+    font-size: 28px;
+  }
+
+  span {
+    font-size: 22px;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: -0.02em;
+  }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--app-surface-container);
+  border: 1px solid var(--app-outline-variant);
+  border-radius: 24px;
+  padding: 32px 24px;
+  box-shadow: 0 8px 32px rgba(224, 64, 160, 0.12);
+}
+
+.auth-card__header {
+  text-align: center;
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--app-on-surface);
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--app-on-surface-variant);
+    margin: 0;
+  }
+}
+
+.auth-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--app-on-surface-variant);
+
+  a {
+    color: var(--app-primary);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--app-secondary);
+    }
+  }
+}

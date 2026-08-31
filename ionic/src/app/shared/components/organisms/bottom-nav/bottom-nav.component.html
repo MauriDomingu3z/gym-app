@@ -1,0 +1,19 @@
+<nav class="bottom-nav">
+  <a routerLink="/dashboard" routerLinkActive="is-active" class="bottom-nav__item">
+    <ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon>
+    <span>Progreso</span>
+  </a>
+  <a routerLink="/favorites" routerLinkActive="is-active" class="bottom-nav__item">
+    <ion-icon name="heart-outline" aria-hidden="true"></ion-icon>
+    <span>Favoritos</span>
+  </a>
+  <a
+    routerLink="/exercises"
+    routerLinkActive="is-active"
+    [routerLinkActiveOptions]="{ exact: false }"
+    class="bottom-nav__item"
+  >
+    <ion-icon name="barbell-outline" aria-hidden="true"></ion-icon>
+    <span>Ejercicios</span>
+  </a>
+</nav>

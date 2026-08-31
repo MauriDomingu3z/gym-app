@@ -1,0 +1,140 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="catalog-title">
+      <ion-icon name="barbell-outline"></ion-icon>
+      Ejercicios
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="confirmLogout()" aria-label="Cerrar sesión">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="has-bottom-nav">
+  <div class="search-row">
+    <ion-searchbar
+      placeholder="Buscar ejercicio"
+      [debounce]="400"
+      (ionInput)="onSearchChanged($any($event.detail.value) ?? '')"
+    ></ion-searchbar>
+    <ion-button class="filters-btn" (click)="openFilters()">
+      <ion-icon slot="start" name="options-outline"></ion-icon>
+      Filtros
+      @if (activeFilters().length) {
+        <ion-badge color="light">{{ activeFilters().length }}</ion-badge>
+      }
+    </ion-button>
+  </div>
+
+  <div class="filters-bar">
+    @for (filter of activeFilters(); track filter.key) {
+      <ion-chip (click)="clearFilter(filter.key)">
+        <ion-label>{{ filter.label }}</ion-label>
+        <ion-icon name="close-circle"></ion-icon>
+      </ion-chip>
+    }
+  </div>
+
+  @if (loading() && exercises().length === 0) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else {
+    <app-exercise-list [exercises]="exercises()" (exerciseSelected)="onExerciseSelected($event)"></app-exercise-list>
+
+    @if (hasMore()) {
+      <div class="ion-text-center ion-padding">
+        <ion-button fill="outline" class="load-more-btn" [disabled]="loading()" (click)="onLoadMore()">
+          {{ loading() ? 'Cargando…' : 'Cargar más' }}
+        </ion-button>
+      </div>
+    }
+  }
+
+  <app-attribution-footer [attribution]="attribution()"></app-attribution-footer>
+
+  <ion-modal class="filters-modal" [isOpen]="isFilterModalOpen()" (didDismiss)="closeFilters()">
+    <ng-template>
+      <ion-header class="filters-modal__header">
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button fill="clear" class="filters-modal__close" (click)="closeFilters()" aria-label="Cerrar">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-title class="filters-modal__title">Filtros</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="solid" color="primary" class="filters-modal__apply" (click)="closeFilters()">
+              Aplicar
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="filters-modal__content">
+        <div class="filters-card">
+          <div class="filter-field">
+            <label class="filter-field__label">Músculo</label>
+            <ion-select
+              aria-label="Músculo"
+              fill="outline"
+              placeholder="Todos"
+              interface="popover"
+              class="filter-select"
+              [value]="selectedMuscle()"
+              (ionChange)="onMuscleChanged($event.detail.value)"
+            >
+              <ion-select-option [value]="null">Todos</ion-select-option>
+              @for (muscle of sortedMuscleOptions(); track muscle) {
+                <ion-select-option [value]="muscle">{{ muscleLabel(muscle) }}</ion-select-option>
+              }
+            </ion-select>
+          </div>
+
+          <div class="filter-field">
+            <label class="filter-field__label">Equipo</label>
+            <ion-select
+              aria-label="Equipo"
+              fill="outline"
+              placeholder="Todos"
+              interface="popover"
+              class="filter-select"
+              [value]="selectedEquipment()"
+              (ionChange)="onEquipmentChanged($event.detail.value)"
+            >
+              <ion-select-option [value]="null">Todos</ion-select-option>
+              @for (equipment of sortedEquipmentOptions(); track equipment) {
+                <ion-select-option [value]="equipment">{{ equipmentLabel(equipment) }}</ion-select-option>
+              }
+            </ion-select>
+          </div>
+
+          <div class="filter-field">
+            <label class="filter-field__label">Tipo</label>
+            <ion-select
+              aria-label="Tipo"
+              fill="outline"
+              placeholder="Todos"
+              interface="popover"
+              class="filter-select"
+              [value]="selectedType()"
+              (ionChange)="onTypeChanged($event.detail.value)"
+            >
+              <ion-select-option [value]="null">Todos</ion-select-option>
+              @for (type of sortedTypeOptions(); track type) {
+                <ion-select-option [value]="type">{{ typeLabel(type) }}</ion-select-option>
+              }
+            </ion-select>
+          </div>
+
+          <ion-button expand="block" fill="clear" class="filters-modal__clear" (click)="clearAllFilters()">
+            Limpiar filtros
+          </ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+
+<app-bottom-nav></app-bottom-nav>
