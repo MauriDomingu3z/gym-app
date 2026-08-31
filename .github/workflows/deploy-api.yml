@@ -35,7 +35,8 @@ jobs:
       - name: Create deployment structure on VPS
         run: |
           ssh -i ~/.ssh/deploy_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            mkdir -p /var/www/gymapi/backend &&
+            sudo mkdir -p /var/www/gymapi/backend &&
+            sudo chown -R \$USER:\$USER /var/www/gymapi &&
             echo 'Directory created successfully'
           "
 
