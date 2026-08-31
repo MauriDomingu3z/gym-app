@@ -1,0 +1,122 @@
+name: Deploy Gym API to VPS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - '.github/workflows/deploy-api.yml'
+
+jobs:
+  deploy:
+    name: Deploy API to VPS
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate deployment secrets
+        run: |
+          if [ -z "${{ secrets.VPS_HOST }}" ]; then echo "ERROR: VPS_HOST not configured"; exit 1; fi
+          if [ -z "${{ secrets.VPS_USER }}" ]; then echo "ERROR: VPS_USER not configured"; exit 1; fi
+          if [ -z "${{ secrets.VPS_SSH_KEY }}" ]; then echo "ERROR: VPS_SSH_KEY not configured"; exit 1; fi
+          echo "All required secrets are configured"
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment structure on VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            mkdir -p /var/www/gymapi/backend &&
+            echo 'Directory created successfully'
+          "
+
+      - name: Copy API source to VPS
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            --exclude 'node_modules' \
+            --exclude '.env' \
+            --exclude 'dist' \
+            --exclude 'public' \
+            ./api/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/gymapi/backend/
+
+      - name: Create backend .env file
+        run: |
+          echo "PORT=7001" > .env
+          echo "NODE_ENV=production" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=5432" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_USER=${{ secrets.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}" >> .env
+
+      - name: Copy .env file to VPS
+        run: |
+          scp -i ~/.ssh/deploy_key .env ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/gymapi/backend/.env
+          rm .env
+
+      - name: Create database if it doesn't exist
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH'
+            sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '${{ secrets.DB_NAME }}'" | grep -q 1 || \
+              sudo -u postgres createdb "${{ secrets.DB_NAME }}" -O "${{ secrets.DB_USERNAME }}"
+          ENDSSH
+
+      - name: Install dependencies, build, migrate and seed
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH'
+            cd /var/www/gymapi/backend
+            sudo chown -R $USER:$USER /var/www/gymapi/backend/node_modules 2>/dev/null || true
+
+            # Clean install avoids leftover half-installed node_modules from a
+            # previous failed deploy silently breaking this one.
+            rm -rf node_modules
+            npm install --production=false
+            npm run prisma:generate
+            npm run build
+            npm run prisma:migrate:deploy
+
+            # Idempotent (upsert by slug) — safe to run on every deploy, also
+            # re-copies exercise images if the public/ folder was wiped.
+            npm run seed
+            npm prune --production
+          ENDSSH
+
+      - name: Restart API with PM2
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH'
+            cd /var/www/gymapi/backend
+
+            pm2 delete gymapi-backend 2>/dev/null || true
+
+            pm2 start dist/server.js --name gymapi-backend
+
+            pm2 save
+          ENDSSH
+
+      - name: Verify deployment
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH'
+            echo "=== PM2 Status ==="
+            pm2 status
+
+            echo ""
+            echo "=== Testing backend health ==="
+            sleep 3
+            curl -f http://localhost:7001/api/health || echo "Warning: Health check failed (endpoint may not exist)"
+          ENDSSH
+
+      - name: Cleanup
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
