@@ -13,7 +13,9 @@ export interface WorkoutRepository {
   finishSession(sessionId: string): Promise<WorkoutSession>;
   findSessionOwner(sessionId: string): Promise<string | null>;
   addExerciseToSession(sessionId: string, exerciseId: string): Promise<WorkoutExercise>;
-  findWorkoutExerciseOwner(workoutExerciseId: string): Promise<string | null>;
+  findWorkoutExerciseOwner(
+    workoutExerciseId: string,
+  ): Promise<{ ownerId: string; exerciseType: string } | null>;
   logSet(workoutExerciseId: string, input: LogSetInput): Promise<WorkoutSet>;
   getLastSet(userId: string, exerciseId: string): Promise<WorkoutSet | null>;
   getExerciseHistory(userId: string, exerciseId: string, limit: number): Promise<ExerciseHistoryEntry[]>;

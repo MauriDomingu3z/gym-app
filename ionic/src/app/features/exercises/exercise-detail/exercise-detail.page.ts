@@ -49,7 +49,6 @@ addIcons({
   'play-skip-forward-outline': playSkipForwardOutline,
 });
 
-const REST_SECONDS = 90;
 const TIMED_TYPES = new Set(['duration', 'distance_duration']);
 
 type TrackerPhase = 'idle' | 'active' | 'resting';
@@ -309,7 +308,7 @@ export class ExerciseDetailPage {
 
   private startRest(): void {
     this.trackerPhase.set('resting');
-    this.restRemainingSeconds.set(REST_SECONDS);
+    this.restRemainingSeconds.set(this.exercise()?.defaultRestSeconds ?? 90);
     clearInterval(this.restIntervalId);
     this.restIntervalId = setInterval(() => {
       const remaining = this.restRemainingSeconds() - 1;

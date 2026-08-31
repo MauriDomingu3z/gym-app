@@ -10,6 +10,7 @@ export interface Exercise {
   secondaryMuscles: string[];
   isStretch: boolean;
   frames: string[];
+  defaultRestSeconds: number;
 }
 
 export interface ExerciseFilter {

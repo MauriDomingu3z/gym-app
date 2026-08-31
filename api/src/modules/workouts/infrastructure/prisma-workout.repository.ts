@@ -58,12 +58,15 @@ export class PrismaWorkoutRepository implements WorkoutRepository {
     });
   }
 
-  async findWorkoutExerciseOwner(workoutExerciseId: string): Promise<string | null> {
+  async findWorkoutExerciseOwner(
+    workoutExerciseId: string,
+  ): Promise<{ ownerId: string; exerciseType: string } | null> {
     const record = await this.prisma.workoutExercise.findUnique({
       where: { id: workoutExerciseId },
-      select: { session: { select: { userId: true } } },
+      select: { session: { select: { userId: true } }, exercise: { select: { exerciseType: true } } },
     });
-    return record?.session.userId ?? null;
+    if (!record) return null;
+    return { ownerId: record.session.userId, exerciseType: record.exercise.exerciseType };
   }
 
   async logSet(workoutExerciseId: string, input: LogSetInput): Promise<WorkoutSet> {

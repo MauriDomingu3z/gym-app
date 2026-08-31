@@ -23,6 +23,36 @@ Reglas de arquitectura no negociables:
 - `npm run dev` (dentro de `api/`) — solo la API.
 - `npm start` (dentro de `ionic/`) — solo Ionic (`ionic/` no tiene script `dev`, usa el nombre por defecto de Angular CLI).
 
+## Build nativo Android (Capacitor)
+
+`ionic/android/` está en `.gitignore` — es un proyecto generado, no se versiona. Después de clonar el repo (o si se borró la carpeta) hay que regenerarlo:
+
+```bash
+cd ionic
+npm run build                    # usa la config "production" (environment.prod.ts → apunta a gymapi.gemaclass.com)
+npx cap add android              # solo si ionic/android/ no existe
+npx cap sync android             # copia el build web nuevo a la carpeta nativa
+```
+
+`@capacitor/android` ya es dependencia del proyecto (`package.json`), no hace falta instalarlo aparte.
+
+**Compilar el APK sin abrir Android Studio:**
+
+```bash
+cd ionic/android
+./gradlew assembleDebug
+```
+
+Requiere el Android SDK (variable `sdk.dir` en `ionic/android/local.properties`, se regenera solo si abrís el proyecto una vez con Android Studio, o se crea a mano apuntando a la carpeta del SDK) y un **JDK 17–21** — Gradle 8.14 todavía no soporta JDK 25 (falla con `Unsupported class file major version 69`). Si el `java` del `PATH` es una versión más nueva, usar el JBR que trae Android Studio:
+
+```bash
+JAVA_HOME="C:\Program Files\Android\Android Studio\jbr" ./gradlew assembleDebug
+```
+
+El APK debug queda en `ionic/android/app/build/outputs/apk/debug/app-debug.apk` — sin firmar, requiere habilitar "orígenes desconocidos" en el celular para instalarlo. Para publicar en Play Store hace falta un build de release firmado con keystore propio (no armado todavía).
+
+Para abrir el proyecto en Android Studio (emulador, debugging, o generar el release firmado): `npx cap open android`.
+
 ## Backend (`api/`) — Arquitectura Hexagonal
 
 El dominio no conoce Express ni Prisma. Cada módulo se organiza en 3 capas:

@@ -6,6 +6,7 @@ import { exercisesRouter } from "../../modules/exercises/infrastructure/exercise
 import { favoritesRouter } from "../../modules/favorites/infrastructure/favorites.routes";
 import { authRouter, usersRouter } from "../../modules/users/infrastructure/users.routes";
 import { workoutsRouter } from "../../modules/workouts/infrastructure/workouts.routes";
+import { docsRouter } from "./docs.routes";
 import { errorMiddleware } from "./errorMiddleware";
 
 export function createApp(): Express {
@@ -28,6 +29,8 @@ export function createApp(): Express {
   app.use("/api/users", usersRouter);
   app.use("/api/workouts", workoutsRouter);
   app.use("/api/favorites", favoritesRouter);
+
+  app.use("/docs", docsRouter);
 
   app.use(errorMiddleware);
 

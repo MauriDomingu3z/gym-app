@@ -12,6 +12,7 @@ export interface ExerciseDTO {
   secondaryMuscles: string[];
   isStretch: boolean;
   frames: string[];
+  defaultRestSeconds: number;
 }
 
 export function toExerciseDTO(exercise: Exercise): ExerciseDTO {
@@ -27,5 +28,6 @@ export function toExerciseDTO(exercise: Exercise): ExerciseDTO {
     secondaryMuscles: exercise.secondaryMuscles,
     isStretch: exercise.isStretch,
     frames: exercise.frames,
+    defaultRestSeconds: exercise.defaultRestSeconds,
   };
 }
