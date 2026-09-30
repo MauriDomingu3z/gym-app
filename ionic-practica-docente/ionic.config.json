@@ -1,0 +1,7 @@
+{
+  "name": "ionic-practica-docente",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

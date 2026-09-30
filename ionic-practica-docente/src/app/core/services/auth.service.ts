@@ -1,0 +1,33 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, tap } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+import { AuthResult, LoginPayload, RegisterPayload } from '../models/auth.model';
+
+const TOKEN_KEY = 'accessToken';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private readonly http = inject(HttpClient);
+
+  Register(payload: RegisterPayload): Observable<AuthResult> {
+    return this.http
+      .post<AuthResult>(`${environment.apiUrl}/auth/register`, payload)
+      .pipe(tap((result) => localStorage.setItem(TOKEN_KEY, result.accessToken)));
+  }
+
+  Login(payload: LoginPayload): Observable<AuthResult> {
+    return this.http
+      .post<AuthResult>(`${environment.apiUrl}/auth/login`, payload)
+      .pipe(tap((result) => localStorage.setItem(TOKEN_KEY, result.accessToken)));
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem(TOKEN_KEY);
+  }
+
+  logout(): void {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+}
