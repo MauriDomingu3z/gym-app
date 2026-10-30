@@ -24,10 +24,26 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    if (!token || this.isExpired(token)) {
+      this.logout();
+      return false;
+    }
+
+    return true;
   }
 
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
+  }
+
+  private isExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return typeof payload.exp !== 'number' || payload.exp * 1000 <= Date.now();
+    } catch {
+      return true;
+    }
   }
 }
